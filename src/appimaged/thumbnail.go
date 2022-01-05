@@ -14,7 +14,7 @@ import (
 
 	"github.com/adrg/xdg"
 	issvg "github.com/h2non/go-is-svg"
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 	pngembed "github.com/sabhiram/png-embed" // For embedding metadata into PNG
 	"github.com/srwiley/oksvg"               // https://github.com/niemeyer/gopkg/issues/72
 	"github.com/srwiley/rasterx"
