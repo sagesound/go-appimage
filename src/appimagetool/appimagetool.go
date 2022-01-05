@@ -17,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 	"github.com/probonopd/go-zsyncmake/zsync"
 	"github.com/mgord9518/imgconv"
 	"gopkg.in/ini.v1"
