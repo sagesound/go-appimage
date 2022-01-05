@@ -72,10 +72,11 @@ func bootstrapMkAppImage(c *cli.Context) error {
 	if osStatInfo.IsDir() {
 		// check if the file provided is an AppDir Directory
 
+		// sagesound: remove uploadtool
 		// Check for needed files on $PATH
 		// curl is needed by uploadtool; TODO: Replace uploadtool with native Go code
 		// "sh", "strings", "grep" are needed by appdirtool to parse qt_prfxpath; TODO: Replace with native Go code
-		tools := []string{"file", "mksquashfs", "desktop-file-validate", "uploadtool", "patchelf", "desktop-file-validate", "patchelf"} // "sh", "strings", "grep" no longer needed?; "curl" is needed for uploading only, "glib-compile-schemas" is needed in some cases only
+		tools := []string{"file", "mksquashfs", "desktop-file-validate", "patchelf", "desktop-file-validate", "patchelf"} // "sh", "strings", "grep" no longer needed?; "curl" is needed for uploading only, "glib-compile-schemas" is needed in some cases only
 		helpers.CheckIfAllToolsArePresent(tools)
 
 		// check if we need to guess the update information
