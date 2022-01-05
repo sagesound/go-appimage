@@ -391,9 +391,9 @@ func GenerateAppImage(
 		//os.Exit(1)
 		use_embed = true
 		if arch == "aarch64" {
-			embedData = rt_x64
-		} else {
 			embedData = rt_arm64
+		} else {
+			embedData = rt_x64
 		}
 	}
 	var firstoffset int64
