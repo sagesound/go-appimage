@@ -13,7 +13,7 @@ import (
 
 	"github.com/esiqveland/notify"
 	"github.com/godbus/dbus/v5"
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 )
 
 // sendUpdateDesktopNotification sends a desktop notification for an update.
