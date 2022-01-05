@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/otiai10/copy"
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 )
 
 type QMLImport struct {
