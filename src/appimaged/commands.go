@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 )
 
 func takeCareOfCommandlineCommands() {
