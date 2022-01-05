@@ -1412,6 +1412,7 @@ func getQtPrfxpath(f *os.File, err error, qtVersion int) string {
 			qt_prfxpath = filepath.Dir(filepath.Dir(filepath.Dir(result)))
 			log.Println("Guessed qt_prfxpath to be", qt_prfxpath)
 			quirksModePatchQtPrfxPath = true
+			break
 		}
 	}
 
