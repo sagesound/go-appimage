@@ -1399,7 +1399,7 @@ func getQtPrfxpath(f *os.File, err error, qtVersion int) string {
 		if !helpers.IsDirectory(qt_prfxpath) {
 			qt_prfxpath = os.GetEnv("HOME")
 					
-			if !helpers.IsDirectory(qt_prfxpath") {
+			if !helpers.IsDirectory(qt_prfxpath) {
 				log.Println("Could not get qt_prfxpath")
 				return ""
 			}
