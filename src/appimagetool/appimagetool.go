@@ -5,6 +5,7 @@ package main
 
 import (
 	// "crypto/md5"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,11 +18,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sagesound/go-appimage/internal/helpers"
-	"github.com/probonopd/go-zsyncmake/zsync"
 	"github.com/mgord9518/imgconv"
+	"github.com/probonopd/go-zsyncmake/zsync"
+	"github.com/sagesound/go-appimage/internal/helpers"
 	"gopkg.in/ini.v1"
 )
+
+//go:embed runtime-x86_64
+var rt_x64 []byte
+
+//go:embed runtime-aarch64
+var rt_arm64 []byte
 
 // ============================
 // CONSTANTS
@@ -326,22 +333,22 @@ func GenerateAppImage(
 		_ = os.Remove(appdir + "/.DirIcon")
 	}
 
-    // If the icon is an svg, attempt to convert it to a png
-    // If that fails, just copy over the original icon
-    iconext := iconfile[len(iconfile)-3:]
-    if iconext == "svg" {
-        err = imgconv.ConvertFileWithAspect(iconfile, appdir+"/.DirIcon", 256, "png")
-        if err != nil {
-            err = helpers.CopyFile(iconfile, appdir+"/.DirIcon")
-        }
-    } else {
-        err = helpers.CopyFile(iconfile, appdir+"/.DirIcon")
-    }
+	// If the icon is an svg, attempt to convert it to a png
+	// If that fails, just copy over the original icon
+	iconext := iconfile[len(iconfile)-3:]
+	if iconext == "svg" {
+		err = imgconv.ConvertFileWithAspect(iconfile, appdir+"/.DirIcon", 256, "png")
+		if err != nil {
+			err = helpers.CopyFile(iconfile, appdir+"/.DirIcon")
+		}
+	} else {
+		err = helpers.CopyFile(iconfile, appdir+"/.DirIcon")
+	}
 
-    if err != nil {
-        helpers.PrintError("Copy .DirIcon", err)
-        os.Exit(1)
-    }
+	if err != nil {
+		helpers.PrintError("Copy .DirIcon", err)
+		os.Exit(1)
+	}
 
 	// Check if AppStream upstream metadata is present in source AppDir
 	// If yes, use ximion's appstreamcli to make sure that desktop file and appdata match together and are valid
@@ -373,20 +380,35 @@ func GenerateAppImage(
 		runtimedir = helpers.Here()
 	}
 	runtimefilepath := runtimedir + "/runtime-" + arch
-	if helpers.CheckIfFileExists(runtimefilepath) == false {
-		log.Println("Cannot find " + runtimefilepath + ", exiting")
-		log.Println("It should have been bundled, but you can get it from https://github.com/AppImage/AppImageKit/releases/continuous")
-		// TODO: Download it from there?
-		os.Exit(1)
-	}
+	var use_embed bool
 
-	// Find out the size of the binary runtime
-	fi, err := os.Stat(runtimefilepath)
-	if err != nil {
-		helpers.PrintError("runtime", err)
-		os.Exit(1)
+	var embedData []byte
+
+	if helpers.CheckIfFileExists(runtimefilepath) == false {
+		log.Println("Cannot find " + runtimefilepath + ", using embed file")
+		//log.Println("It should have been bundled, but you can get it from https://github.com/AppImage/AppImageKit/releases/continuous")
+		// TODO: Download it from there?
+		//os.Exit(1)
+		use_embed = true
+		if arch == "aarch64" {
+			embedData = rt_x64
+		} else {
+			embedData = rt_arm64
+		}
 	}
-	offset := fi.Size()
+	var firstoffset int64
+
+	if !use_embed {
+		// Find out the size of the binary runtime
+		fi, err := os.Stat(runtimefilepath)
+		if err != nil {
+			helpers.PrintError("runtime", err)
+			os.Exit(1)
+		}
+		firstoffset = fi.Size()
+	} else {
+		firstoffset = int64(len(embedData))
+	}
 
 	// We supply our own fstime rather than letting mksquashfs determine it
 	// so that we know its value for being able to publish it
@@ -414,7 +436,7 @@ func GenerateAppImage(
 	}
 
 	// "mksquashfs", source, destination, "-offset", offset, "-comp", "gzip", "-root-owned", "-noappend"
-	cmd := exec.Command("mksquashfs", appdir, target, "-offset", strconv.FormatInt(offset, 10), "-fstime", fstime, "-comp", squashfsCompressionType, "-root-owned", "-noappend")
+	cmd := exec.Command("mksquashfs", appdir, target, "-offset", strconv.FormatInt(firstoffset, 10), "-fstime", fstime, "-comp", squashfsCompressionType, "-root-owned", "-noappend")
 	fmt.Println(cmd.String())
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
@@ -427,10 +449,30 @@ func GenerateAppImage(
 	// Embed the binary runtime into the squashfs
 	fmt.Println("Embedding ELF...")
 
-	err = helpers.WriteFileIntoOtherFileAtOffset(runtimefilepath, target, 0)
-	if err != nil {
-		helpers.PrintError("Embedding runtime", err)
-		os.Exit(1)
+	if !use_embed {
+		err = helpers.WriteFileIntoOtherFileAtOffset(runtimefilepath, target, 0)
+		if err != nil {
+			helpers.PrintError("Embedding runtime", err)
+			os.Exit(1)
+		}
+	} else {
+		fo, err := os.OpenFile(target, os.O_WRONLY, 0644)
+		if err != nil {
+			helpers.PrintError("Embedding runtime, OpenFile", err)
+			os.Exit(1)
+		}
+
+		_, err = fo.Seek(int64(0), 0)
+		if err != nil {
+			helpers.PrintError("Embedding runtime, Seek", err)
+			os.Exit(1)
+		}
+		if _, err := fo.Write(embedData); err != nil {
+			helpers.PrintError("Embedding runtime, Write", err)
+			os.Exit(1)
+		}
+
+		fo.Close()
 	}
 
 	fmt.Println("Marking the AppImage as executable...")
