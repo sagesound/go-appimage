@@ -479,7 +479,7 @@ func GenerateAppImage(
 	_ = os.Chmod(target, 0755)
 
 	// Get the filesize in bytes of the resulting AppImage
-	_, err := os.Stat(target)
+	_, err = os.Stat(target)
 	if err != nil {
 		helpers.PrintError("Could not get size of AppImage", err)
 		os.Exit(1)
