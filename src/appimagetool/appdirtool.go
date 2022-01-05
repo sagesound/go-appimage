@@ -236,6 +236,10 @@ func AppDirDeploy(path string) {
 	log.Println("Find out whether Qt is a dependency of the application to be bundled...")
 
 	qtVersionDetected := 0
+	if containsString(allELFs, "libQt6Core.so.6") == true {
+		log.Println("Detected Qt 6")
+		qtVersionDetected = 6
+	}
 
 	if containsString(allELFs, "libQt5Core.so.5") == true {
 		log.Println("Detected Qt 5")
@@ -393,7 +397,7 @@ func deployInterpreter(appdir helpers.AppDir) (string, error) {
 			helpers.PrintError("Could not deploy the interpreter", err)
 			os.Exit(1)
 		}
-		
+
 		// Make ld-linux executable
 		err = os.Chmod(ldTargetPath, 0755)
 		if err != nil {
@@ -1133,17 +1137,18 @@ func handleQt(appdir helpers.AppDir, qtVersion int) {
 	if qtVersion >= 5 {
 
 		// Actually the libQt5Core.so.5 contains (always?) qt_prfxpath=... which tells us the location in which 'plugins/' is located
+		libname := fmt.Sprintf("libQt%dCore.so.%d", qtVersion, qtVersion)
 
-		library, err := findLibrary("libQt5Core.so.5")
+		library, err := findLibrary(libname)
 		if err != nil {
-			helpers.PrintError("Could not find libQt5Core.so.5", err)
+			helpers.PrintError("Could not find "+libname, err)
 			os.Exit(1)
 		}
 
 		f, err := os.Open(library)
 		defer f.Close()
 		if err != nil {
-			helpers.PrintError("Could not open libQt5Core.so.5", err)
+			helpers.PrintError("Could not open "+libname, err)
 			os.Exit(1)
 		}
 
@@ -1198,9 +1203,9 @@ func handleQt(appdir helpers.AppDir, qtVersion int) {
 		// Platform OpenGL context, if one of several libraries is about to be deployed
 		// similar to https://github.com/probonopd/linuxdeployqt/blob/42e51ea7c7a572a0aa1a21fc47d0f80032809d9d/tools/linuxdeployqt/shared.cpp#L1282
 		for _, lib := range allELFs {
-			if strings.HasSuffix(lib, "libQt5Gui.so.5") == true ||
-				strings.HasSuffix(lib, "libQt5OpenGL.so.5") == true ||
-				strings.HasSuffix(lib, "libQt5XcbQpa.so.5") == true ||
+			if strings.HasSuffix(lib, fmt.Sprintf("libQt%dGui.so.%d", qtVersion, qtVersion)) == true ||
+				strings.HasSuffix(lib, fmt.Sprintf("libQt%dOpenGL.so.%d", qtVersion, qtVersion)) == true ||
+				strings.HasSuffix(lib, fmt.Sprintf("libQt%dXcbQpa.so.%d", qtVersion, qtVersion)) == true ||
 				strings.HasSuffix(lib, "libxcb-glx.so") == true {
 				{
 					determineELFsInDirTree(appdir, qtPrfxpath+"/plugins/xcbglintegrations/")
@@ -1218,6 +1223,7 @@ func handleQt(appdir helpers.AppDir, qtVersion int) {
 			}
 		}
 
+		//Qt6: bearer seems not used.
 		// Network bearers, if libQt5Network.so.5 is about to be deployed
 		// similar to https://github.com/probonopd/linuxdeployqt/blob/42e51ea7c7a572a0aa1a21fc47d0f80032809d9d/tools/linuxdeployqt/shared.cpp#L1304
 		for _, lib := range allELFs {
