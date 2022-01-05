@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
-	"github.com/probonopd/go-appimage/internal/helpers"
-	"github.com/probonopd/go-appimage/src/goappimage"
+	"github.com/sagesound/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/src/goappimage"
 	"go.lsp.dev/uri"
 )
 
