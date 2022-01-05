@@ -1,4 +1,4 @@
-module github.com/probonopd/go-appimage
+module github.com/sagesound/go-appimage
 
 go 1.17
 
