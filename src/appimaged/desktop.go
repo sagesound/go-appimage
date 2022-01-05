@@ -17,7 +17,7 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/adrg/xdg"
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 	"gopkg.in/ini.v1"
 )
 
