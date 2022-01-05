@@ -479,7 +479,7 @@ func GenerateAppImage(
 	_ = os.Chmod(target, 0755)
 
 	// Get the filesize in bytes of the resulting AppImage
-	fi, err := os.Stat(target)
+	_, err := os.Stat(target)
 	if err != nil {
 		helpers.PrintError("Could not get size of AppImage", err)
 		os.Exit(1)
@@ -674,7 +674,7 @@ func GenerateAppImage(
 		zsync.ZsyncMake(target, opts)
 
 		// Check if the zsync file is really there
-		fi, err := os.Stat(target + ".zsync")
+		_, err := os.Stat(target + ".zsync")
 		if err != nil {
 			helpers.PrintError("zsync file not generated", err)
 			os.Exit(1)
