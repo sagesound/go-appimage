@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 
 	"github.com/godbus/dbus/v5"
 )
