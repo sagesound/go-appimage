@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 	"github.com/shuheiktgw/go-travis"
 	"gopkg.in/src-d/go-git.v4"
 )
