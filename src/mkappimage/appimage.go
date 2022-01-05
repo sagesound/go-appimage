@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/probonopd/go-appimage/internal/helpers"
+	"github.com/sagesound/go-appimage/internal/helpers"
 )
 
 // Handles AppImage files.
