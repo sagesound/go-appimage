@@ -1396,6 +1396,16 @@ func getQtPrfxpath(f *os.File, err error, qtVersion int) string {
 	// In this case, we should NOT patch it
 	if helpers.IsDirectory(qt_prfxpath+"/plugins") == false {
 		log.Println("Got qt_prfxpath but it does not contain 'plugins'")
+		if !helpers.IsDirectory(qt_prfxpath) {
+			qt_prfxpath = os.GetEnv("HOME")
+					
+			if !helpers.IsDirectory(qt_prfxpath") {
+				log.Println("Could not get qt_prfxpath")
+				return ""
+			}
+			qt_prfxpath += "/Qt"
+		}
+		
 		results := helpers.FilesWithSuffixInDirectoryRecursive(qt_prfxpath, "libqxcb.so")
 		log.Println("libqxcb.so found:", results)
 		for _, result := range results { // FIXME: Probably we should just pick the first one and go with it
