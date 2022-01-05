@@ -1397,7 +1397,7 @@ func getQtPrfxpath(f *os.File, err error, qtVersion int) string {
 	if helpers.IsDirectory(qt_prfxpath+"/plugins") == false {
 		log.Println("Got qt_prfxpath but it does not contain 'plugins'")
 		if !helpers.IsDirectory(qt_prfxpath) {
-			qt_prfxpath = os.GetEnv("HOME")
+			qt_prfxpath = os.Getenv("HOME")
 					
 			if !helpers.IsDirectory(qt_prfxpath) {
 				log.Println("Could not get qt_prfxpath")
